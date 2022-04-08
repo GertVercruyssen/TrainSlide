@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() ,android.view.View.OnTouchListener, and
         camera = engine.createCamera().apply { setExposure(kAperture, kShutterSpeed, kSensitivity) }
         assetLoader = AssetLoader(engine, MaterialProvider(engine), EntityManager.get())
         resourceLoader = ResourceLoader(engine)
-        GameLogic.engine = engine
+        GameLogic.initMembers(engine,camera)
     }
 
     private fun setupScene() {
@@ -118,8 +118,10 @@ class MainActivity : AppCompatActivity() ,android.view.View.OnTouchListener, and
         camera.setExposure(16.0f, 1.0f / 125.0f, 100.0f)
 
         // Add renderable entities to the scene as they become ready.
-        loadGlb("spider")
-        loadGlb("floor")
+        loadGlb("train1", false)
+        loadGlb("train2",false)
+        loadGlb("station")
+        GameLogic.doSetupObjects()
     }
 
     private val frameCallback = object : Choreographer.FrameCallback {
@@ -177,7 +179,7 @@ class MainActivity : AppCompatActivity() ,android.view.View.OnTouchListener, and
     /**
      * Loads a monolithic binary glTF and populates the Filament scene.
      */
-    private fun loadGlb(name: String) : FilamentAsset {
+    private fun loadGlb(name: String, static: Boolean=true) : FilamentAsset {
         val asset : FilamentAsset?
         val buffer = readAsset("models/${name}.glb")
 
@@ -185,7 +187,7 @@ class MainActivity : AppCompatActivity() ,android.view.View.OnTouchListener, and
         asset?.let {
             resourceLoader.loadResources(asset)
             asset.releaseSourceData()
-            GameLogic.addGameObject(name ,asset, scene)
+            GameLogic.addGameObject(name ,asset, scene, static)
         }
         return asset!!
     }
@@ -233,8 +235,7 @@ class MainActivity : AppCompatActivity() ,android.view.View.OnTouchListener, and
         return super.onTouchEvent(event)
     }
 
-    override fun onSensorChanged(event: SensorEvent)
-    {
+    override fun onSensorChanged(event: SensorEvent) {
         GameLogic.tilt = event.values[1]
     }
 

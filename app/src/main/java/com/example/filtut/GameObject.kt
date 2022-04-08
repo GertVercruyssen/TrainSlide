@@ -4,8 +4,7 @@ import com.google.android.filament.*
 import com.google.android.filament.gltfio.FilamentAsset
 import com.google.android.filament.utils.*
 
-open class GameObject(private var asset: FilamentAsset, private var scene: Scene) {
-
+open class GameObject(private var asset: FilamentAsset, private var scene: Scene, private var static: Boolean=true) {
     var scale = 0.0f
     var position: Float3 = Float3(0.0f, 0.0f, 0.0f)
     var rotation: Float3 = Float3(0.0f, 0.0f, 0.0f)
@@ -14,20 +13,25 @@ open class GameObject(private var asset: FilamentAsset, private var scene: Scene
     private var previousFrametime : Double = 0.0
 
     fun step(time: Double, tm:TransformManager) {
-        var dTime = time- previousFrametime
-        previousFrametime = time
-        animationTimer +=dTime
+        if(!static) {
+            var dTime = time - previousFrametime
+            previousFrametime = time
+            animationTimer += dTime
 
-        performBehavior(dTime)
+            performBehavior(dTime)
 
-        var matscale = scale(Float3(scale,scale,scale))
-        var matrotation = rotation(rotation)
-        var mattranslation = translation(position)
-        tm.setTransform(tm.getInstance(asset.root), transpose(matscale.times(mattranslation).times(matrotation)).toFloatArray())
+            var matscale = scale(Float3(scale, scale, scale))
+            var matrotation = rotation(rotation)
+            var mattranslation = translation(position)
+            tm.setTransform(
+                tm.getInstance(asset.root),
+                transpose(matscale.times(mattranslation).times(matrotation)).toFloatArray()
+            )
 
-        currentanimation?.let { it1 ->
-            asset.animator.applyAnimation(it1, animationTimer.toFloat())
-            asset.animator.updateBoneMatrices()
+            currentanimation?.let { it1 ->
+                asset.animator.applyAnimation(it1, animationTimer.toFloat())
+                asset.animator.updateBoneMatrices()
+            }
         }
     }
 
