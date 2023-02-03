@@ -1,0 +1,8 @@
+//setting the stage
+light:temperature=6500,intensity=110000,directionx=-0.753,directiony=-1.0,directionz=0.890,shadows=true
+environment:filename=venetian_crossroads_2k
+camera:aperture=16,shutterSpeed=0.008,sensitivity=100,fov=45
+//trains have specified logic
+object1:objectname=train1,filename=train,static=false
+object2:objectname=train2,filename=train,static=false
+object3:objectname=station,filename=station,static=true
